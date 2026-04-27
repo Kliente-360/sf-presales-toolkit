@@ -1,0 +1,32 @@
+# Salesforce CLI
+.sfdx/
+.sf/
+
+# Node (dependências de plugins SFDX)
+node_modules/
+npm-debug.log*
+
+# Outputs de clientes — nunca versionar dados de clientes
+outputs/*.md
+
+# Inputs de clientes — notas brutas não sobem pro repo
+inputs/*.md
+inputs/*.txt
+inputs/*.pdf
+inputs/*.docx
+
+# Logs e temporários
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente
+.env
+.env.local
+
+# Credenciais e tokens
+*.pem
+*.key
+authFile.json
