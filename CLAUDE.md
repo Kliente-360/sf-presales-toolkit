@@ -144,3 +144,58 @@ Mapeie as dores identificadas no discovery para as clouds abaixo:
 - Scripts em `/scripts/` assumem que o CLI `sf` (Salesforce CLI v2) está instalado.
 - Metadados por segmento ficam em `/force-app/` organizados por pasta.
 - Dados de demo ficam em `/data/<segmento>/`.
+
+---
+
+## Funil Comercial de Diagnóstico
+
+Pipeline automatizado que transforma respostas de formulário em entregáveis profissionais prontos para envio.
+
+### Fluxo completo para um novo cliente
+
+```bash
+# 1. Processar formulário (JSON, CSV ou entrada manual)
+python pipeline/ingestao.py
+# → salva em inputs/{cliente}_{data}_formulario.json
+
+# 2. Gerar diagnóstico (~1 min)
+python pipeline/diagnostico.py <slug-cliente>
+# → salva em outputs/{cliente}_{data}_diagnostico.md
+
+# 3a. Setup da demo — Pacotes 2 e 3
+python pipeline/demo_setup.py <slug-cliente>
+# → deploy na demo-org + outputs/{cliente}_{data}_roteiro.md + _objecoes.md
+
+# 3b. Gerar proposta — Pacote 3
+python pipeline/proposta.py <slug-cliente>
+# → salva em outputs/{cliente}_{data}_proposta.md
+```
+
+### Pacotes e entregáveis
+
+| Pacote | Preço | Scripts usados | Entregáveis |
+|---|---|---|---|
+| Diagnóstico | R$ 497 | `ingestao` + `diagnostico` | `_diagnostico.md` |
+| Diag + Demo | R$ 997 | + `demo_setup` | + `_roteiro.md`, `_objecoes.md` |
+| Diag + Demo + Proposta | R$ 1.997 | + `proposta` | + `_proposta.md` |
+
+### Arquivos do funil
+
+| Arquivo | Descrição |
+|---|---|
+| `funil/formulario.md` | Estrutura do formulário para configurar no Typeform / Google Forms |
+| `funil/pacotes.md` | Definição dos pacotes, critérios de upsell e scripts de abordagem |
+| `funil/email_templates.md` | Templates de email prontos para cada etapa (5 emails) |
+
+### Templates de output
+
+Os templates em `outputs/templates/` são a referência estrutural dos documentos gerados.
+Os scripts preenchem os placeholders `{VARIAVEL}` automaticamente — não edite os placeholders.
+
+### Critérios de upsell automáticos (detectados por `ingestao.py`)
+
+- Empresa > 50 funcionários → sugerir Pacote 3
+- Budget declarado > R$ 30k → sugerir Pacote 3
+- Prazo imediato → sugerir Pacote 2 ou 3
+- Já usa Salesforce → sugerir Pacote 2 (demo de evolução)
+- 3+ dores críticas marcadas → sugerir Pacote 3
